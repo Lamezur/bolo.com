@@ -1,0 +1,86 @@
+-- ==========================
+-- Schéma de la base bolo.com
+-- ==========================
+
+-- Table : Candidat
+CREATE TABLE candidat (
+    id_candidat SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    mot_de_passe TEXT NOT NULL,
+    cv_url TEXT,
+    date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table : Entreprise
+CREATE TABLE entreprise (
+    id_entreprise SERIAL PRIMARY KEY,
+    nom VARCHAR(150) NOT NULL,
+    email_contact VARCHAR(150) NOT NULL,
+    site_web VARCHAR(255),
+    date_creation_compte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table : UtilisateurEntreprise
+CREATE TABLE utilisateur_entreprise (
+    id_utilisateur SERIAL PRIMARY KEY,
+    id_entreprise INT NOT NULL REFERENCES entreprise(id_entreprise) ON DELETE CASCADE,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    role VARCHAR(50) CHECK (role IN ('administrateur', 'recruteur')) NOT NULL,
+    mot_de_passe TEXT NOT NULL
+);
+
+-- Table : OffreEmploi
+CREATE TABLE offre_emploi (
+    id_offre SERIAL PRIMARY KEY,
+    id_entreprise INT NOT NULL REFERENCES entreprise(id_entreprise) ON DELETE CASCADE,
+    titre VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    localisation VARCHAR(150),
+    type_contrat VARCHAR(50) CHECK (type_contrat IN ('CDI','CDD','Freelance','Stage','Autre')),
+    date_publication TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    statut VARCHAR(50) CHECK (statut IN ('active','expiree','archivee')) DEFAULT 'active'
+);
+
+-- Table : Candidature
+CREATE TABLE candidature (
+    id_candidature SERIAL PRIMARY KEY,
+    id_candidat INT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_offre INT NOT NULL REFERENCES offre_emploi(id_offre) ON DELETE CASCADE,
+    date_candidature TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    statut VARCHAR(50) CHECK (statut IN ('en_cours','accepte','rejete','entretien')) DEFAULT 'en_cours',
+    UNIQUE (id_candidat, id_offre) -- empêche qu'un candidat postule deux fois à la même offre
+);
+
+-- Table : AlerteEmploi
+CREATE TABLE alerte_emploi (
+    id_alerte SERIAL PRIMARY KEY,
+    id_candidat INT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    mots_cles VARCHAR(255),
+    localisation VARCHAR(150),
+    type_contrat VARCHAR(50),
+    frequence VARCHAR(50) CHECK (frequence IN ('quotidienne','hebdomadaire')),
+    canal VARCHAR(50) CHECK (canal IN ('email','push')) DEFAULT 'email'
+);
+
+-- Table : TestCompetence
+CREATE TABLE test_competence (
+    id_test SERIAL PRIMARY KEY,
+    type_test VARCHAR(50) CHECK (type_test IN ('langue','technique','logique','autre')) NOT NULL,
+    titre VARCHAR(150) NOT NULL,
+    description TEXT,
+    niveau VARCHAR(50) CHECK (niveau IN ('debutant','intermediaire','avance'))
+);
+
+-- Table : ResultatTest
+CREATE TABLE resultat_test (
+    id_resultat SERIAL PRIMARY KEY,
+    id_candidat INT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_test INT NOT NULL REFERENCES test_competence(id_test) ON DELETE CASCADE,
+    score NUMERIC(5,2),
+    date_passage TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (id_candidat, id_test, date_passage) -- un candidat peut repasser un test, mais pas deux fois à la même date
+);
