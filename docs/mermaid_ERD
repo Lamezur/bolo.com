@@ -1,0 +1,81 @@
+erDiagram
+    Candidat ||--o{ Candidature : postule
+    OffreEmploi ||--o{ Candidature : reçoit
+    Entreprise ||--o{ OffreEmploi : publie
+    Entreprise ||--o{ UtilisateurEntreprise : possède
+    Candidat ||--o{ AlerteEmploi : configure
+    Candidat ||--o{ ResultatTest : passe
+    TestCompetence ||--o{ ResultatTest : concerne
+
+    Candidat {
+        int id_candidat PK
+        string nom
+        string prenom
+        string email
+        string mot_de_passe
+        string cv_url
+        date date_inscription
+    }
+
+    Entreprise {
+        int id_entreprise PK
+        string nom
+        string email_contact
+        string site_web
+        date date_creation_compte
+    }
+
+    UtilisateurEntreprise {
+        int id_utilisateur PK
+        int id_entreprise FK
+        string nom
+        string prenom
+        string email
+        string rôle
+        string mot_de_passe
+    }
+
+    OffreEmploi {
+        int id_offre PK
+        int id_entreprise FK
+        string titre
+        string description
+        string localisation
+        string type_contrat
+        date date_publication
+        string statut
+    }
+
+    Candidature {
+        int id_candidature PK
+        int id_candidat FK
+        int id_offre FK
+        date date_candidature
+        string statut
+    }
+
+    AlerteEmploi {
+        int id_alerte PK
+        int id_candidat FK
+        string mots_cles
+        string localisation
+        string type_contrat
+        string frequence
+        string canal
+    }
+
+    TestCompetence {
+        int id_test PK
+        string type_test
+        string titre
+        string description
+        string niveau
+    }
+
+    ResultatTest {
+        int id_resultat PK
+        int id_candidat FK
+        int id_test FK
+        float score
+        date date_passage
+    }
