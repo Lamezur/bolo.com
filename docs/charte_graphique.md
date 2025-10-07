@@ -1,7 +1,7 @@
 # Charte Graphique — bolo.com
 
 ## 🎨 Palette de couleurs
-- **Bleu principal (#1E3A8A)** → Confiance, professionnalisme  
+- **Bleu principal (#1A73E8)** → Confiance, professionnalisme  
 - **Vert secondaire (#10B981)** → Croissance, succès (CTA / boutons)  
 - **Gris clair (#F3F4F6)** → Fond neutre, lisibilité  
 - **Noir (#111827)** → Texte principal  
